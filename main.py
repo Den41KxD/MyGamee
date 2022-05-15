@@ -1,17 +1,55 @@
 import random
 
 from kivy.app import App
+
+from kivy.core.window import Window
+from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
+from kivy.uix.slider import Slider
 
+A="""
+<MenuScreen>:
+    BoxLayout:
+        Button:
+            text: 'Start'
+            on_press: root.manager.current = 'settings'
+        Button:
+            text: 'Quit'
+        Button:
+            text: 'Settings'
+            on_press: root.manager.current = 'game'
+# <SettingsScreen>:
+#     BoxLayout:
+#         orientation: "vertical"
+#         Label:
+#             text: 'Settings:'
+#             center_x: 0.5
+#             center_y: 0.5
+#         Label:
+#             text: 'choose difficulty:'
+#             center_x: 0.5
+#             center_y: 0.5
+#             
+#         Slider:
+#             min: 3
+#             max: 15
+#             step: 1
+#             value_track: True
+#         
+#         Button:
+#             text: 'Go Play'
+#             on_press: root.manager.current='game'
+        
+"""
+Builder.load_string(A)
 
-
-
-
-class MainApp(App):
+class MyGameApp(BoxLayout):
     def __init__(self, size_of_gread):
-        super(MainApp, self).__init__()
+        super(MyGameApp, self).__init__()
         self.size_of_gread= size_of_gread
 
 
@@ -23,21 +61,6 @@ class MainApp(App):
         self.button_two = False
         self.all_number_layout = BoxLayout(orientation="vertical")
         self.main_mass = self.get_matrix()
-
-        # for i in range(n):
-        #     tmp_mas=list()
-        #     for j in range(n):
-        #         tmp_mas.append(random.randint(1,9))
-        #     tmp_mas.append(sum(tmp_mas))
-        # self.main_mass = self.main_mass
-        # collum_sum = list()
-        # for i in range(n):
-        #     mysum = 0
-        #     for j in range(n):
-        #         mysum += self.main_mass[j][i]
-        #     collum_sum.append(mysum)
-        # # collum_sum.append(0)
-        # self.main_mass.append(collum_sum)
 
         row_count=0
         for row in self.main_mass:
@@ -168,6 +191,53 @@ class MainApp(App):
 
         return buttons
 
-if __name__ == "__main__":
-    app = MainApp(6)
-    app.run()
+class MenuScreen(Screen):
+    pass
+
+class SettingsLayout(BoxLayout):
+    def build(self):
+        self.diff_slider = Slider(min=3, max=15, step=1,value_track=True)
+        self.diff_text = Label(text='3')
+        self.diff_slider.bind(value=self.get_pos)
+        self.settings_layout = BoxLayout(orientation="vertical")
+        self.settings_layout.add_widget(
+            Label(text='Settings:', pos_hint={"center_x": 0.5, "center_y": 0.5}))
+        self.settings_layout.add_widget(
+            Label(text='choose difficulty:', pos_hint={"center_x": 0.5, "center_y": 0.5}))
+        self.settings_layout.add_widget(self.diff_text)
+        self.settings_layout.add_widget(self.diff_slider)
+        self.settings_layout.add_widget(Button(text='Go Play',on_press= self.create_game))
+        return self.settings_layout
+
+    def get_pos(self,*args,**kwargs):
+        self.diff_text.text = str(self.diff_slider.value)
+
+    def create_game(self,*args,**kwargs):
+        print('dsjf')
+
+class GameScreen(Screen):
+    def __init__(self,**kwargs):
+        super(GameScreen, self).__init__(**kwargs)
+        layout = MyGameApp(4).build()
+        self.add_widget(layout)
+
+class SettingsScreen(Screen):
+    def __init__(self,**kwargs):
+        super(SettingsScreen, self).__init__(**kwargs)
+        layout = SettingsLayout().build()
+        self.add_widget(layout)
+
+
+class ExampleApp(App):
+
+    def build(self):
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(SettingsScreen(name='settings'))
+        sm.add_widget(GameScreen(name='game'))
+
+        return sm
+
+
+if __name__ == '__main__':
+    ExampleApp().run()
