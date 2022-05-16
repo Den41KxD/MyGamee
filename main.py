@@ -1,9 +1,13 @@
+import datetime
 import random
 
+from kivy.animation import Animation
 from kivy.app import App
+from kivy.clock import Clock
 
 from kivy.core.window import Window
 from kivy.lang import Builder
+from kivy.properties import NumericProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -11,41 +15,53 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
 from kivy.uix.slider import Slider
 
-A="""
+MAIN_WINDOW_KV= """
 <MenuScreen>:
     BoxLayout:
+        orientation: "vertical"
         Button:
             text: 'Start'
             on_press: root.manager.current = 'settings'
         Button:
-            text: 'Quit'
-        Button:
             text: 'Settings'
             on_press: root.manager.current = 'game'
-# <SettingsScreen>:
-#     BoxLayout:
-#         orientation: "vertical"
-#         Label:
-#             text: 'Settings:'
-#             center_x: 0.5
-#             center_y: 0.5
-#         Label:
-#             text: 'choose difficulty:'
-#             center_x: 0.5
-#             center_y: 0.5
-#             
-#         Slider:
-#             min: 3
-#             max: 15
-#             step: 1
-#             value_track: True
-#         
-#         Button:
-#             text: 'Go Play'
-#             on_press: root.manager.current='game'
+        Button:
+            text: 'Quit'
+            on_press: app.stop() 
         
+<SettingsScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            text: 'Settings:'
+            center_x: 0.5
+            center_y: 0.5
+        Label:
+            text: 'choose difficulty:'
+            center_x: 0.5
+            center_y: 0.5
+        
+        
+        Slider:
+            id: slider
+            min: 3
+            max: 15
+            step: 1
+            value_track: True
+            
+        Label:
+            text: str(slider.value)
+
+        Button:
+            text: 'Go Play'
+            on_press: root.printMe()
+            # on_press: root.manager.current='game'
 """
-Builder.load_string(A)
+
+Builder.load_string(MAIN_WINDOW_KV)
+
+
+
 
 class MyGameApp(BoxLayout):
     def __init__(self, size_of_gread):
@@ -59,6 +75,16 @@ class MyGameApp(BoxLayout):
         self.flag2 = False
         self.button_one = False
         self.button_two = False
+        self.info_layout = BoxLayout(orientation="horizontal",size=(800, 50), size_hint=(None, None))
+        self.steps_label = Label(text=str(0))
+        # self.timer =Clock.schedule_interval(self.set_time,1)
+        self.info_layout.add_widget(Label(text='Steps: '))
+        self.info_layout.add_widget(self.steps_label)
+        self.info_layout.add_widget(Label(text='Time: '))
+        # self.info_layout.add_widget(self.timer)
+
+        self.main_layout.add_widget(self.info_layout)
+
         self.all_number_layout = BoxLayout(orientation="vertical")
         self.main_mass = self.get_matrix()
 
@@ -87,6 +113,7 @@ class MyGameApp(BoxLayout):
         self.main_layout.add_widget(self.all_number_layout)
         return self.main_layout
 
+
     def on_button_press(self, button):
 
         if self.flag1 == False:
@@ -97,6 +124,7 @@ class MyGameApp(BoxLayout):
             self.flag2=True
             self.button_two = button
         if self.flag1 and self.flag2:
+            self.steps_label.text = str(int(self.steps_label.text)+1)
             tmp_var = self.button_one.text
             self.button_one.text=self.button_two.text
             self.button_two.text = tmp_var
@@ -130,7 +158,7 @@ class MyGameApp(BoxLayout):
     def get_matrix(self):
         import copy
 
-        generete_rand = self.size_of_gread * random.randint(4, 9)
+        generete_rand = self.size_of_gread * random.randint(self.size_of_gread, self.size_of_gread*random.randint(3,6))
         buttons = list()
         Icount = 0
         for i in range(self.size_of_gread):
@@ -149,7 +177,7 @@ class MyGameApp(BoxLayout):
                     if self.size_of_gread - 1 == count:
                         tmp_mas.append(random_arr)
                     else:
-                        f = random.randint(2, 9)
+                        f = random.randint(self.size_of_gread, self.size_of_gread*2)
                         random_arr -= f
                         tmp_mas.append(f)
                         count += 1
@@ -194,50 +222,30 @@ class MyGameApp(BoxLayout):
 class MenuScreen(Screen):
     pass
 
-class SettingsLayout(BoxLayout):
-    def build(self):
-        self.diff_slider = Slider(min=3, max=15, step=1,value_track=True)
-        self.diff_text = Label(text='3')
-        self.diff_slider.bind(value=self.get_pos)
-        self.settings_layout = BoxLayout(orientation="vertical")
-        self.settings_layout.add_widget(
-            Label(text='Settings:', pos_hint={"center_x": 0.5, "center_y": 0.5}))
-        self.settings_layout.add_widget(
-            Label(text='choose difficulty:', pos_hint={"center_x": 0.5, "center_y": 0.5}))
-        self.settings_layout.add_widget(self.diff_text)
-        self.settings_layout.add_widget(self.diff_slider)
-        self.settings_layout.add_widget(Button(text='Go Play',on_press= self.create_game))
-        return self.settings_layout
-
-    def get_pos(self,*args,**kwargs):
-        self.diff_text.text = str(self.diff_slider.value)
-
-    def create_game(self,*args,**kwargs):
-        print('dsjf')
-
 class GameScreen(Screen):
-    def __init__(self,**kwargs):
+    def __init__(self,grid,**kwargs):
         super(GameScreen, self).__init__(**kwargs)
-        layout = MyGameApp(4).build()
+        layout = MyGameApp(grid).build()
         self.add_widget(layout)
+
 
 class SettingsScreen(Screen):
-    def __init__(self,**kwargs):
-        super(SettingsScreen, self).__init__(**kwargs)
-        layout = SettingsLayout().build()
-        self.add_widget(layout)
+    def printMe(self):
+        self.parent.add_widget(GameScreen(grid=self.ids.slider.value,name='game'))
+        self.parent.current='game'
 
 
 class ExampleApp(App):
 
     def build(self):
         sm = ScreenManager()
+
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(SettingsScreen(name='settings'))
-        sm.add_widget(GameScreen(name='game'))
 
         return sm
 
 
 if __name__ == '__main__':
     ExampleApp().run()
+
