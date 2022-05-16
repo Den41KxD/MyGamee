@@ -68,20 +68,27 @@ class MyGameApp(BoxLayout):
         super(MyGameApp, self).__init__()
         self.size_of_gread= size_of_gread
 
+    def set_time(self,*args):
+        print(datetime.datetime.now()- self.start_time)
+        self.timer_label.text = str(datetime.datetime.now() - self.start_time)[0:7]
+
+
 
     def build(self):
         self.main_layout = BoxLayout(orientation="vertical")
+        self.start_time = datetime.datetime.now()
         self.flag1 = False
         self.flag2 = False
         self.button_one = False
         self.button_two = False
         self.info_layout = BoxLayout(orientation="horizontal",size=(800, 50), size_hint=(None, None))
         self.steps_label = Label(text=str(0))
-        # self.timer =Clock.schedule_interval(self.set_time,1)
+        Clock.schedule_interval(self.set_time,1)
+        self.timer_label = Label(text='0')
         self.info_layout.add_widget(Label(text='Steps: '))
         self.info_layout.add_widget(self.steps_label)
         self.info_layout.add_widget(Label(text='Time: '))
-        # self.info_layout.add_widget(self.timer)
+        self.info_layout.add_widget(self.timer_label)
 
         self.main_layout.add_widget(self.info_layout)
 
