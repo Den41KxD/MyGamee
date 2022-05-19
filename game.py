@@ -14,8 +14,6 @@ class MyGameApp(BoxLayout):
         super(MyGameApp, self).__init__()
         self.size_of_gread = size_of_gread
 
-
-    def build(self):
         self.main_layout = BoxLayout(orientation="vertical")
         self.start_time = datetime.datetime.now()
         self.flag1 = False
@@ -26,7 +24,7 @@ class MyGameApp(BoxLayout):
         self.info_layout = BoxLayout(orientation="horizontal", size=(800, 50), size_hint=(None, None))
         self.steps_label = Label(text=str(0))
         self.clock = Clock.schedule_interval(self.set_time, 1)
-        self.back_button = Button(text='Back', on_press = self.back_button_dis)
+        self.back_button = Button(text='Back', on_press=self.back_button_dis)
         self.timer_label = Label(text='0')
         self.info_layout.add_widget(self.back_button)
         self.info_layout.add_widget(Label(text='Steps: '))
@@ -37,6 +35,8 @@ class MyGameApp(BoxLayout):
         self.all_number_layout = BoxLayout(orientation="vertical")
         self.main_mass = self.get_matrix()
 
+
+    def build(self):
         row_count = 0
         for row in self.main_mass:
             h_layout = BoxLayout()
@@ -142,12 +142,20 @@ class MyGameApp(BoxLayout):
                 self.end_game_button.text = ' Good\n Tap for New Game'
                 self.new_game_flag = True
 
-                popup_content = Button(text=f'Good job, you result:\n'
+                popup = Popup(auto_dismiss=False, title='nice', size_hint=(None, None),
+                              size=(400, 400))
+                popup_content = BoxLayout(orientation="vertical")
+                popup_label = Label(text=f'Good job, you result:\n'
                                             f'passed in {self.timer_label.text} minutes\n'
                                             f'completed in {self.steps_label.text} steps\n',
                                        size=(400, 400))
-                popup = Popup(content=popup_content, auto_dismiss=False, title='nice', size_hint=(None, None),
-                              size=(400, 400))
+                popup_content.add_widget(popup_label)
+
+                popup.add_widget(popup_content)
+                popup_button = Button(text='Close',
+                                      size_hint=(1, 0.2),
+                                      on_press=popup.dismiss)
+                popup_content.add_widget(popup_button)
 
                 # bind the on_press event of the button to the dismiss function
                 popup_content.bind(on_press=popup.dismiss)
@@ -158,12 +166,21 @@ class MyGameApp(BoxLayout):
             else:
                 self.end_game_button.background_color = [1, 0, 0]
                 self.new_game_flag = False
-                popup_content = Button(text=f'sum of numbers in all rows and columns\n '
-                                            f'is not equal {self.generete_rand}',
-                                       size=(400, 400))
-                popup = Popup(content=popup_content, auto_dismiss=False, title='nice', size_hint=(None, None),
+                popup = Popup(auto_dismiss=False,
+                              title='',
+                              size_hint=(None, None),
                               size=(400, 400))
-                popup_content.bind(on_press=popup.dismiss)
+                popup_content = BoxLayout(orientation="vertical")
+                popup_label = Label(text=f'sum of numbers in all rows and columns\n '
+                                            f'is not equal {self.generete_rand}',
+                                    size=(400, 400))
+                popup_content.add_widget(popup_label)
+
+                popup.add_widget(popup_content)
+                popup_button = Button(text='Close',
+                                      size_hint=(1, 0.2),
+                                      on_press=popup.dismiss)
+                popup_content.add_widget(popup_button)
                 popup.open()
         else:
             screen_for_delete = self.main_layout.parent.manager.get_screen('game')

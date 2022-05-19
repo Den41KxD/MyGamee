@@ -15,15 +15,18 @@ MAIN_WINDOW_KV="""
     id: AboutPopup
     auto_dismiss: False
     title: 'About' 
-    orientation: "horizontal"
     BoxLayout:
+        orientation: "vertical"
+
         TextInput:
-            text:'Alternately swap the cubes until the sum of all horizontal and vertical ones is the same.\
-                For help, the required amount is indicated on the button at the bottom right.\
-                When the amount is the same everywhere, click on the button at the bottom right,\
-                see your result and proceed to the next level'
+            multiline: True
+            text:
+                'Alternately swap the cubes until the sum of all horizontal and vertical ones is the same.\\nFor help, the required amount is indicated on the button at the bottom right.\\n\
+                When the amount is the same everywhere, click on the button at the bottom right, see your result and proceed to the next level\\n\
+                complaints and suggestions: denyshrachov96@gmail.com'
             disabled: True 
         Button:
+            size_hint: 1, 0.2
             text:'Close'
             on_press: AboutPopup.dismiss()
     
