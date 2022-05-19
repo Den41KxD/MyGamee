@@ -40,6 +40,8 @@ MAIN_WINDOW_KV="""
         Button:
             text: 'About'
             on_release: Factory.MyPopup().open()
+            
+
         Button:
             text: 'Quit'
             on_press: app.stop()
@@ -48,16 +50,10 @@ MAIN_WINDOW_KV="""
     BoxLayout:
         orientation: "vertical"
 
-
+        
         Button:
-            text: 'return to game'
-            on_state:
-                if 'game' in root.manager.screen_names:\
-                    root.manager.current='game'
-                    
-        Button:
-            text: 'Back'
-            on_press: root.manager.current='menu'
+            text: 'Load Last Game'
+            on_press: root.load_game()
 
         Label:
             text: 'Settings:'
@@ -80,8 +76,12 @@ MAIN_WINDOW_KV="""
 
         Button:
             text: 'Go Play'
-            on_press: root.printMe()
+            on_press: root.new_game()
             # on_press: root.manager.current='game'
+                    
+        Button:
+            text: 'Back'
+            on_press: root.manager.current='menu'
 """
 
 Builder.load_string(MAIN_WINDOW_KV)

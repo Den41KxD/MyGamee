@@ -1,28 +1,31 @@
-import datetime
+import pathlib
+from datetime import datetime
 import random
-
+import os.path
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
+from kivy.storage.jsonstore import JsonStore
+
+store = JsonStore('hello.json')
+file_path = "hello.json"
 
 
 class MyGameApp(BoxLayout):
     def __init__(self, size_of_gread):
         super(MyGameApp, self).__init__()
-        self.size_of_gread = size_of_gread
-
         self.main_layout = BoxLayout(orientation="vertical")
-        self.start_time = datetime.datetime.now()
+        self.start_time = datetime.now()
         self.flag1 = False
         self.flag2 = False
         self.button_one = False
         self.button_two = False
         self.new_game_flag = False
-        self.info_layout = BoxLayout(orientation="horizontal", size=(800, 50), size_hint=(None, None))
         self.steps_label = Label(text=str(0))
+        self.info_layout = BoxLayout(orientation="horizontal", size=(800, 50), size_hint=(None, None))
         self.clock = Clock.schedule_interval(self.set_time, 1)
         self.back_button = Button(text='Back', on_press=self.back_button_dis)
         self.timer_label = Label(text='0')
@@ -33,6 +36,7 @@ class MyGameApp(BoxLayout):
         self.info_layout.add_widget(self.timer_label)
         self.main_layout.add_widget(self.info_layout)
         self.all_number_layout = BoxLayout(orientation="vertical")
+        self.size_of_gread = size_of_gread
         self.main_mass = self.get_matrix()
 
 
@@ -94,11 +98,29 @@ class MyGameApp(BoxLayout):
             tmp_var = self.button_one.text
             self.button_one.text = self.button_two.text
             self.button_two.text = tmp_var
+
             self.flag2 = False
             self.flag1 = False
             self.button_one.background_color = [1, 1, 1]
             self.button_one.index = self.button_one.parent.children.index(self.button_one)
             self.button_two.index = self.button_two.parent.children.index(self.button_two)
+
+
+            button_one_jindex=self.button_one.parent.parent.children.index(self.button_one.parent)
+            button_two_jindex = self.button_two.parent.parent.children.index(self.button_two.parent)
+
+
+            tmp_var_for_mass = self.main_mass[self.size_of_gread - button_two_jindex][self.size_of_gread-self.button_two.index]
+            self.main_mass[self.size_of_gread - button_two_jindex][self.size_of_gread - self.button_two.index]=\
+                self.main_mass[self.size_of_gread - button_one_jindex][self.size_of_gread - self.button_one.index]
+            self.main_mass[self.size_of_gread - button_one_jindex][self.size_of_gread - self.button_one.index]=tmp_var_for_mass
+
+
+
+            print(self.main_mass[self.size_of_gread - button_two_jindex][self.size_of_gread-self.button_two.index])
+            print(self.main_mass[self.size_of_gread-button_one_jindex][self.size_of_gread - self.button_one.index])
+
+
 
             new_sum = 0
             new_sum2 = 0
@@ -119,9 +141,11 @@ class MyGameApp(BoxLayout):
                     new_sum_4 += int(i.children[self.button_two.index].text)
             self.all_number_layout.children[0].children[int(self.button_one.index)].text = str(new_sum_3)
             self.all_number_layout.children[0].children[int(self.button_two.index)].text = str(new_sum_4)
+            if int(self.steps_label.text) % 1 == 0:
+                self.save_game()
 
     def set_time(self, *args):
-        self.timer_label.text = str(datetime.datetime.now() - self.start_time)[0:7]
+        self.timer_label.text = str(datetime.now() - self.start_time)[0:7]
 
     def back_button_dis(self,button):
         self.main_layout.parent.manager.current = 'settings'
@@ -182,9 +206,11 @@ class MyGameApp(BoxLayout):
                 popup.open()
         else:
             screen_for_delete = self.main_layout.parent.manager.get_screen('game')
-
             self.main_layout.parent.manager.current = 'settings'
             self.main_layout.parent.manager.remove_widget(screen_for_delete)
+            os.remove(file_path)
+
+
 
     def get_matrix(self):
         import copy
@@ -248,3 +274,22 @@ class MyGameApp(BoxLayout):
         buttons.append(random_arr)
 
         return buttons
+
+    def save_game(self):
+
+        store.put('tito',
+                  steps=self.steps_label.text,
+                  main_mass=self.main_mass,
+                  size_of_gread=self.size_of_gread,
+                  generete_rand=self.generete_rand)
+        print('tito is', store.get('tito'))
+
+
+class LoadGame(MyGameApp):
+    def __init__(self):
+        super(LoadGame, self).__init__(random.randint(4,9))
+        if os.path.exists(file_path):
+            self.size_of_gread=store.get('tito').get('size_of_gread')
+            self.main_mass = store.get('tito').get('main_mass')
+            self.generete_rand = store.get('tito').get('generete_rand')
+            self.steps_label.text = str(store.get('tito').get('steps'))
