@@ -53,7 +53,7 @@ class MyGameApp(BoxLayout):
                             pos_hint={"center_x": 0.5, "center_y": 0.5},
                             halign = "center",
                             background_color =[1,0.8,0],
-                            disabled = True
+                            disabled=True
                         )
                     h_layout.add_widget(button)
 
@@ -142,13 +142,11 @@ class MyGameApp(BoxLayout):
                 self.end_game_button.text = ' Good\n Tap for New Game'
                 self.new_game_flag = True
 
-                popup = Popup(auto_dismiss=False, title='nice', size_hint=(None, None),
-                              size=(400, 400))
+                popup = Popup(auto_dismiss=False, title='nice', size_hint=(0.7, 0.7))
                 popup_content = BoxLayout(orientation="vertical")
                 popup_label = Label(text=f'Good job, you result:\n'
                                             f'passed in {self.timer_label.text} minutes\n'
-                                            f'completed in {self.steps_label.text} steps\n',
-                                       size=(400, 400))
+                                            f'completed in {self.steps_label.text} steps\n')
                 popup_content.add_widget(popup_label)
 
                 popup.add_widget(popup_content)
@@ -168,8 +166,8 @@ class MyGameApp(BoxLayout):
                 self.new_game_flag = False
                 popup = Popup(auto_dismiss=False,
                               title='',
-                              size_hint=(None, None),
-                              size=(400, 400))
+                              size_hint=(0.7, 0.7))
+                              # size=(400, 400))
                 popup_content = BoxLayout(orientation="vertical")
                 popup_label = Label(text=f'sum of numbers in all rows and columns\n '
                                             f'is not equal {self.generete_rand}',
@@ -210,7 +208,7 @@ class MyGameApp(BoxLayout):
                     if self.size_of_gread - 1 == count:
                         tmp_mas.append(random_arr)
                     else:
-                        f = random.randint(self.size_of_gread, self.size_of_gread*2)
+                        f = int(self.generete_rand/self.size_of_gread +random.randint(-self.size_of_gread*2,self.size_of_gread*2))
                         random_arr -= f
                         tmp_mas.append(f)
                         count += 1
