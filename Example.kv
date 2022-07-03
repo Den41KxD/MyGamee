@@ -1,0 +1,140 @@
+
+#:import Factory kivy.factory.Factory
+
+<MyPopup@Popup>:
+    id: AboutPopup
+    auto_dismiss: False
+    title: 'About'
+    BoxLayout:
+        orientation: "vertical"
+
+
+        TextInput:
+            multiline: True
+            text:
+                'Alternately swap the cubes until the sum of all horizontal and vertical ones is the same.\\nFor help, the required amount is indicated on the button at the bottom right.\\n\
+                When the amount is the same everywhere, click on the button at the bottom right, see your result and proceed to the next level\\n\
+                complaints and suggestions: denyshrachov96@gmail.com'
+            disabled: True
+
+
+        Button:
+            size_hint: 1, 0.2
+            text:'Close'
+            on_press: AboutPopup.dismiss()
+
+
+
+
+<RoundedButton_start@Button>:
+    background_color: (1,0,1,0)
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (145/255,145/255,145/255,1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [58]
+
+
+<RoundedButton_about@Button>:
+    background_color: (1,0,1,0)
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (100/255,100/255,100/255,1)
+
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [58]
+
+<RoundedButton_quit@Button>:
+    background_color: (1,0,1,0)
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (50/255,50/255,50/255,1)
+
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [58]
+
+
+<MenuScreen>:
+
+    BoxLayout:
+
+        orientation: "vertical"
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'media/settings_menu.jpg'
+
+        FloatLayout:
+            RoundedButton_start:
+                font_size: 20
+                pos_hint: {"center_x": 0.5,"top" : 0.6}
+                size_hint: 0.5,0.175
+                text: 'Start'
+                on_press: root.manager.current = 'settings'
+            RoundedButton_about:
+                font_size: 20
+                size_hint: 0.5,0.175
+                pos_hint: {"center_x":0.5,"top" : 0.40}
+                text: 'About'
+                on_release: Factory.MyPopup().open()
+            RoundedButton_quit:
+                pos_hint: {"center_x":0.5,"top" : 0.20}
+                font_size: 20
+                size_hint: 0.5,0.175
+                text: 'Quit'
+                on_press: app.stop()
+
+
+
+
+<SettingsScreen>:
+    BoxLayout:
+#        canvas.before:
+#            Rectangle:
+#                pos: self.pos
+#                size: self.size
+##                source: 'media/settings_menu.jpg'
+        orientation: "vertical"
+
+
+        Button:
+            text: 'Load Last Game'
+            on_press: root.load_game()
+
+        Label:
+            text: 'Settings:'
+            center_x: 0.5
+            center_y: 0.5
+        Label:
+            text: 'choose difficulty:'
+            center_x: 0.5
+            center_y: 0.5
+
+        Slider:
+            id: slider
+            min: 3
+            max: 15
+            step: 1
+            value_track: True
+
+        Label:
+            text: str(slider.value)
+
+        Button:
+            text: 'Go Play'
+            on_press: root.new_game()
+
+        Button:
+            text: 'Back'
+            on_press: root.manager.current='menu'
+

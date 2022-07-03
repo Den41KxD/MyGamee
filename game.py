@@ -13,7 +13,6 @@ from kivy.storage.jsonstore import JsonStore
 store = JsonStore('hello.json')
 file_path = "hello.json"
 
-
 class MyGameApp(BoxLayout):
     def __init__(self, size_of_gread):
         super(MyGameApp, self).__init__()
@@ -282,7 +281,6 @@ class MyGameApp(BoxLayout):
                   main_mass=self.main_mass,
                   size_of_gread=self.size_of_gread,
                   generete_rand=self.generete_rand)
-        print('tito is', store.get('tito'))
 
 
 class LoadGame(MyGameApp):
